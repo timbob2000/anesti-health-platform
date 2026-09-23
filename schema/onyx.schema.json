@@ -1,0 +1,21 @@
+{
+  "revisionDescription": "Workspace notes: ownership-scoped CRUD example",
+  "entities": [
+    {
+      "name": "WorkspaceNote",
+      "type": "DEFAULT",
+      "identifier": { "name": "id", "generator": "None", "type": "String" },
+      "attributes": [
+        { "name": "id", "type": "String", "isNullable": false },
+        { "name": "ownerId", "type": "String", "isNullable": false },
+        { "name": "title", "type": "String", "isNullable": false },
+        { "name": "body", "type": "String", "isNullable": false },
+        { "name": "createdAt", "type": "Timestamp", "isNullable": false },
+        { "name": "updatedAt", "type": "Timestamp", "isNullable": false }
+      ],
+      "indexes": [{ "name": "ownerId", "type": "DEFAULT" }, { "name": "updatedAt", "type": "DEFAULT" }],
+      "resolvers": [],
+      "triggers": []
+    }
+  ]
+}

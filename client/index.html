@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Fieldnotes · Onyx Workspace</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header><a class="brand" href="/" aria-label="Fieldnotes home"><span class="mark">F</span>Fieldnotes</a><div class="header-actions"><span id="environment" class="badge">Workspace</span><button id="theme" class="subtle" aria-label="Switch color theme">◐</button><button id="signout" class="subtle" hidden>Sign out</button></div></header>
+    <main>
+      <div class="intro"><p class="eyebrow">YOUR IDEAS, CONNECTED</p><h1>A little space for<br />what comes next.</h1><p>A private notebook powered by Onyx and Firebase.<br />Start with an idea. Build something useful.</p></div>
+      <p id="status" role="status" aria-live="polite" hidden></p>
+      <section id="signin" class="panel auth-panel" aria-labelledby="signin-heading">
+        <h2 id="signin-heading">Welcome to your workspace</h2><p class="muted">Sign in to see your notes. Only you can access them.</p>
+        <form id="signin-form"><label>Email<input name="email" type="email" autocomplete="email" required maxlength="254" /></label><label>Password<input name="password" type="password" autocomplete="current-password" required minlength="6" maxlength="128" /></label><div class="actions"><button type="submit">Sign in</button><button type="button" id="signup" class="secondary">Create account</button></div></form>
+        <button type="button" id="google" class="secondary full" hidden>Continue with Google</button>
+      </section>
+      <section id="notebook" hidden aria-labelledby="notes-heading"><div class="section-heading"><div><h2 id="notes-heading">Your notes</h2><p id="identity" class="muted"></p></div><span id="count" class="badge">0 notes</span></div>
+        <div class="workspace-grid"><form id="note-form" class="panel"><h3 id="editor-heading">Capture a thought</h3><label>Title<input name="title" required maxlength="120" placeholder="A fresh idea…" /></label><label>Note<textarea name="body" rows="7" maxlength="4000" placeholder="Give it a little room to grow."></textarea></label><div class="actions"><button type="submit" id="save">Save note</button><button type="button" id="cancel" class="subtle" hidden>Cancel edit</button></div></form><div><p id="empty" class="empty">Your next idea starts here.<br /><span>Add a note and make this space yours.</span></p><div id="notes" class="notes"></div></div></div>
+      </section>
+    </main>
+    <footer>Built with Onyx <span>Private by design. Ready for your next idea.</span></footer>
+  </body>
+</html>

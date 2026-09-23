@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.env
+.env.*
+.migration-state
+*.pem
+*service-account*.json
+*.log

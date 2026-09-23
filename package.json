@@ -1,0 +1,26 @@
+{
+  "name": "onyx-workspace-application",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node --env-file-if-exists=.env server/index.mjs",
+    "test": "node --test test/*.test.mjs",
+    "schema:diff": "node --env-file-if-exists=.env scripts/migrate.mjs diff",
+    "schema:validate": "node --env-file-if-exists=.env scripts/migrate.mjs validate",
+    "schema:publish": "node --env-file-if-exists=.env scripts/migrate.mjs apply",
+    "migrate": "node --env-file-if-exists=.env scripts/migrate.mjs apply",
+    "migrate:status": "node --env-file-if-exists=.env scripts/migrate.mjs status",
+    "schema:compatible": "node --env-file-if-exists=.env scripts/migrate.mjs compatible"
+  },
+  "dependencies": {
+    "@onyx.dev/onyx-database": "2.8.1",
+    "firebase": "12.19.0",
+    "firebase-admin": "14.4.0"
+  },
+  "devDependencies": { "esbuild": "0.28.2" },
+  "overrides": { "gaxios": { "uuid": "11.1.1" } }
+}

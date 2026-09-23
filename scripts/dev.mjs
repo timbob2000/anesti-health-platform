@@ -1,0 +1,14 @@
+import { context } from 'esbuild';
+import { cp, mkdir } from 'node:fs/promises';
+import { watch } from 'node:fs';
+import { spawn } from 'node:child_process';
+await mkdir('dist', { recursive: true });
+const copyAssets = async () => { await cp('client/index.html', 'dist/index.html'); await cp('client/app.css', 'dist/app.css'); };
+await copyAssets();
+const builder = await context({ entryPoints: ['client/app.js'], bundle: true, format: 'esm', outfile: 'dist/app.js', target: ['es2022'] });
+await builder.watch();
+const watcher = watch('client', () => copyAssets().catch(() => console.error('Asset rebuild failed.')));
+const child = spawn(process.execPath, ['--watch', 'server/index.mjs'], { stdio: 'inherit', env: { ...process.env, WORKSPACE_PREVIEW: 'true' } });
+const stop = async () => { watcher.close(); child.kill(); await builder.dispose(); };
+process.on('SIGINT', stop); process.on('SIGTERM', stop);
+child.on('exit', async code => { await stop(); process.exitCode = code || 0; });
