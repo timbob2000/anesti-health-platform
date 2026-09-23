@@ -1,7 +1,22 @@
 import { initializeApp } from 'firebase/app';
+import symbolSnapshot from './symbols.json';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 
 const $ = id => document.getElementById(id);
+function renderSymbols() {
+  const query = $('symbol-search').value.trim().toLowerCase();
+  const symbols = symbolSnapshot.symbols.filter(symbol => symbol.toLowerCase().includes(query));
+  $('symbol-list').replaceChildren(...symbols.map(symbol => {
+    const item = document.createElement('li');
+    item.textContent = symbol;
+    return item;
+  }));
+  $('symbol-count').textContent = `${symbolSnapshot.symbols.length} symbols`;
+  $('symbols-status').textContent = symbols.length ? `${symbols.length} symbol${symbols.length === 1 ? '' : 's'} shown` : 'No symbols match your search.';
+}
+$('symbol-search').addEventListener('input', renderSymbols);
+$('symbols-source').textContent = `Database snapshot · ${new Date(symbolSnapshot.asOf).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}`;
+renderSymbols();
 let auth, editingId = null;
 const notify = message => { $('status').textContent = message; $('status').hidden = !message; };
 const safeError = error => error.code?.startsWith('auth/') ? 'Sign-in was unsuccessful. Check your details and enabled sign-in provider.' : error.message || 'Something went wrong. Please try again.';
@@ -50,17 +65,49 @@ $('note-form').onsubmit = async event => {
   catch (error) { notify(safeError(error)); } finally { $('save').disabled = false; }
 };
 
+const authNotice = message => { $('auth-status').textContent = message; $('auth-status').hidden = !message; };
+const authControls = [...$('signin-form').querySelectorAll('input, button'), $('google')];
+function setAuthBusy(busy) {
+  for (const control of authControls) control.disabled = busy;
+  $('signin').setAttribute('aria-busy', String(busy));
+}
+$('toggle-password').onclick = () => {
+  const show = $('password').type === 'password';
+  $('password').type = show ? 'text' : 'password';
+  $('toggle-password').textContent = show ? 'Hide password' : 'Show password';
+  $('toggle-password').setAttribute('aria-pressed', String(show));
+};
+async function authenticate(run, message) {
+  setAuthBusy(true); authNotice(message);
+  try { await run(); $('signin-form').reset(); authNotice(''); }
+  catch { authNotice('Sign-in was unsuccessful. Check your details and try again.'); }
+  finally { setAuthBusy(false); $('password').type = 'password'; $('toggle-password').textContent = 'Show password'; $('toggle-password').setAttribute('aria-pressed', 'false'); }
+}
+// Prevent accidental form navigation while configuration is loading or unavailable.
+$('signin-form').onsubmit = event => event.preventDefault();
+setAuthBusy(true);
 try {
   const response = await fetch('/api/config');
-  if (!response.ok) throw new Error('Configure Firebase and Onyx for this environment to start the application.');
+  if (!response.ok) throw new Error('Sign-in is not configured yet. Please try again once setup is complete.');
   const config = await response.json(); auth = getAuth(initializeApp(config.firebase)); $('environment').textContent = config.environment;
-  $('signin-form').hidden = !config.providers.includes('password'); $('google').hidden = !config.providers.includes('google');
-  $('signin-form').onsubmit = async event => { event.preventDefault(); notify(''); try { const form = event.currentTarget; await signInWithEmailAndPassword(auth, form.elements.email.value, form.elements.password.value); form.reset(); } catch (error) { notify(safeError(error)); } };
-  $('signup').onclick = async () => { const form = $('signin-form'); if (!form.reportValidity()) return; try { await createUserWithEmailAndPassword(auth, form.elements.email.value, form.elements.password.value); form.reset(); } catch (error) { notify(safeError(error)); } };
-  $('google').onclick = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { notify(safeError(error)); } };
+  const passwordEnabled = config.providers.includes('password');
+  const googleEnabled = config.providers.includes('google');
+  $('signin-form').hidden = !passwordEnabled; $('google').hidden = !googleEnabled;
+  $('auth-divider').hidden = !(passwordEnabled && googleEnabled);
+  setAuthBusy(false); authNotice(passwordEnabled || googleEnabled ? '' : 'No sign-in provider is available. Contact the workspace owner.');
+  $('signin-form').onsubmit = event => {
+    event.preventDefault(); const form = event.currentTarget;
+    authenticate(() => signInWithEmailAndPassword(auth, form.elements.email.value.trim(), form.elements.password.value), 'Signing you in…');
+  };
+  $('signup').onclick = () => {
+    const form = $('signin-form'); if (!form.reportValidity()) return;
+    if (form.elements.password.value.length < 6) { authNotice('Choose a password with at least 6 characters to create an account.'); form.elements.password.focus(); return; }
+    authenticate(() => createUserWithEmailAndPassword(auth, form.elements.email.value.trim(), form.elements.password.value), 'Creating your account…');
+  };
+  $('google').onclick = () => authenticate(() => signInWithPopup(auth, new GoogleAuthProvider()), 'Connecting to Google…');
   $('signout').onclick = () => signOut(auth).catch(error => notify(safeError(error)));
   onAuthStateChanged(auth, async user => {
-    $('signin').hidden = !!user; $('notebook').hidden = !user; $('signout').hidden = !user; $('notes').replaceChildren(); resetEditor(); notify('');
-    if (user) { $('identity').textContent = user.email || 'Signed in'; try { await refresh(); } catch (error) { notify(safeError(error)); } }
+    $('login-layout').hidden = !!user; $('notebook').hidden = !user; $('signout').hidden = !user; $('notes').replaceChildren(); resetEditor(); notify('');
+    if (user) { $('identity').textContent = user.email || 'Signed in'; notify('Loading your notes…'); try { await refresh(); notify(''); } catch (error) { notify(safeError(error)); } }
   });
-} catch (error) { notify(safeError(error)); $('signin').hidden = true; }
+} catch { authNotice('Sign-in is currently unavailable. The workspace owner may need to finish Firebase setup. Refresh to try again.'); setAuthBusy(true); $('signin').setAttribute('aria-busy', 'false'); }

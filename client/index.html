@@ -4,24 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
-    <title>Fieldnotes · Onyx Workspace</title>
+    <title>Fieldnotes · Your private notebook</title>
     <link rel="stylesheet" href="/app.css" />
     <script type="module" src="/app.js"></script>
   </head>
   <body>
     <header><a class="brand" href="/" aria-label="Fieldnotes home"><span class="mark">F</span>Fieldnotes</a><div class="header-actions"><span id="environment" class="badge">Workspace</span><button id="theme" class="subtle" aria-label="Switch color theme">◐</button><button id="signout" class="subtle" hidden>Sign out</button></div></header>
     <main>
-      <div class="intro"><p class="eyebrow">YOUR IDEAS, CONNECTED</p><h1>A little space for<br />what comes next.</h1><p>A private notebook powered by Onyx and Firebase.<br />Start with an idea. Build something useful.</p></div>
-      <p id="status" role="status" aria-live="polite" hidden></p>
-      <section id="signin" class="panel auth-panel" aria-labelledby="signin-heading">
-        <h2 id="signin-heading">Welcome to your workspace</h2><p class="muted">Sign in to see your notes. Only you can access them.</p>
-        <form id="signin-form"><label>Email<input name="email" type="email" autocomplete="email" required maxlength="254" /></label><label>Password<input name="password" type="password" autocomplete="current-password" required minlength="6" maxlength="128" /></label><div class="actions"><button type="submit">Sign in</button><button type="button" id="signup" class="secondary">Create account</button></div></form>
-        <button type="button" id="google" class="secondary full" hidden>Continue with Google</button>
+      <section class="symbols-stage" aria-labelledby="symbols-heading">
+        <div class="panel symbols-panel">
+          <p class="eyebrow">STOCK ANALYSIS</p>
+          <div class="symbols-heading"><h1 id="symbols-heading">All symbols</h1><span id="symbol-count" class="badge"></span></div>
+          <p id="symbols-source" class="muted">Symbols from your database.</p>
+          <label for="symbol-search">Find a symbol<input id="symbol-search" type="search" placeholder="Search tickers…" autocomplete="off" /></label>
+          <p id="symbols-status" role="status" aria-live="polite">Loading symbols…</p>
+          <ul id="symbol-list" class="symbol-list" aria-label="Symbols"></ul>
+          <noscript>Enable JavaScript to view the symbol list.</noscript>
+        </div>
       </section>
+      <div id="login-layout" class="login-layout">
+      <aside class="intro"><p class="eyebrow">A LITTLE SPACE FOR BIG IDEAS</p><h1>Your thoughts.<br />A place to call<br /><em>their own.</em></h1><p>Catch a fleeting thought. Make room for a new idea.<br />Keep it all together in your own private notebook.</p><div class="notebook-art" aria-hidden="true"><div class="paper paper-back"></div><div class="paper paper-front"><span class="paper-label">A NOTE TO SELF</span><span class="handwritten">Start somewhere.<br />See where it goes.</span><span class="paper-star">✳</span></div></div><p class="privacy-note">◈ &nbsp; Your space. Your notes. Always private.</p></aside>
+      <section id="signin" class="panel auth-panel" aria-labelledby="signin-heading">
+        <span class="welcome-icon" aria-hidden="true">↗</span><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="signin-heading">Welcome back.</h2><p class="muted">Sign in to pick up where you left off.</p>
+        <p id="auth-status" role="status" aria-live="polite">Getting sign-in ready…</p>
+        <button type="button" id="google" class="secondary full" disabled hidden><span class="google-mark" aria-hidden="true">G</span> Continue with Google</button><div id="auth-divider" class="divider" hidden>or use your email</div>
+        <form id="signin-form"><label>Email address<input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required maxlength="254" disabled /></label><label>Password<span class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required maxlength="128" disabled /></span></label><button type="button" id="toggle-password" class="subtle password-toggle" aria-controls="password" aria-pressed="false">Show password</button><button id="login-submit" class="full" type="submit" disabled>Sign in →</button><p class="signup-prompt">New to Fieldnotes? <button type="button" id="signup" class="text-button" disabled>Create an account</button></p></form>
+        <p class="auth-footnote">A quiet corner for everything on your mind.</p>
+      </section></div>
+      <p id="status" role="status" aria-live="polite" hidden></p>
       <section id="notebook" hidden aria-labelledby="notes-heading"><div class="section-heading"><div><h2 id="notes-heading">Your notes</h2><p id="identity" class="muted"></p></div><span id="count" class="badge">0 notes</span></div>
         <div class="workspace-grid"><form id="note-form" class="panel"><h3 id="editor-heading">Capture a thought</h3><label>Title<input name="title" required maxlength="120" placeholder="A fresh idea…" /></label><label>Note<textarea name="body" rows="7" maxlength="4000" placeholder="Give it a little room to grow."></textarea></label><div class="actions"><button type="submit" id="save">Save note</button><button type="button" id="cancel" class="subtle" hidden>Cancel edit</button></div></form><div><p id="empty" class="empty">Your next idea starts here.<br /><span>Add a note and make this space yours.</span></p><div id="notes" class="notes"></div></div></div>
       </section>
     </main>
-    <footer>Built with Onyx <span>Private by design. Ready for your next idea.</span></footer>
+    <footer><span>© Fieldnotes</span><span>A little more clarity, one note at a time.</span><span>Powered by Onyx</span></footer>
   </body>
 </html>
